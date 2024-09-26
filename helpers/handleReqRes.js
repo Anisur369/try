@@ -10,6 +10,7 @@ const url = require('url');
 const {StringDecoder} = require('string_decoder');
 const routers = require('../lib/routers');
 const {notFound} = require('../lib/routers/notFound');
+const { parseJSON } = require('./utilities');
 
 //modue scaffolding
 const handler={};
@@ -45,15 +46,15 @@ handler.handleReqRes = (req,res) => {
     })
     req.on('end', () => {
         realData+=decoder.end();
-        requestProperties.body = realData;
-        console.log(requestProperties.body)
+        requestProperties.body = parseJSON(realData);
         
         chosenHandler(requestProperties,(statusCode, payload)=> {
             statusCode = typeof(statusCode) === 'number' ? statusCode : 500;
-            payload = typeof(payload) === 'object' ? payload : {};            
+            payload = typeof(payload) === 'object' ? payload : {};  
+            const payloadString = JSON.stringify(payload);          
             res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
-            res.end(payload.message);
+            res.end(payloadString);
         })
     });
     
