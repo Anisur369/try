@@ -4,60 +4,71 @@
 *Author: Anisur Rahman (Learn with Anis)
 *Date:09/12/24
 *
+
 */
-//Dependencies
-const url = require('url');
-const {StringDecoder} = require('string_decoder');
-const routers = require('../lib/routers');
-const {notFound} = require('../lib/routers/notFound');
-const { parseJSON } = require('./utilities');
+
+const url=require('url');
+const {StringDecoder}=require('string_decoder');
+const routes=require('../routes');
+const {notFoundHandler}=require('../handlers/routerHandlers/notFoundHandler');
+const {parseJSON} = require('./utilities');
+
 
 //modue scaffolding
 const handler={};
 
-handler.handleReqRes = (req,res) => {
-    const parseUrl = url.parse(req.url, true);
-    const path = parseUrl.pathname;
-    const trimmedPath = path.replace(/^\/+|\?+$/g,'');
-    const method = req.method.toLowerCase();
-    const queryString = parseUrl.query;
-    const query = req.query;
-    const headers = req.headers;
+handler.handleReqRes=(req,res)=>{
+    //request handling
 
-    const requestProperties = {
-        parseUrl,
+    //get the url and parse it
+    const parsedUrl=url.parse(req.url,true);
+    const path=parsedUrl.pathname;
+    const trimmedPath=path.replace(/^\/+|\?+$/g,'');
+    const method=req.method.toLowerCase();
+    const queryStringObject=parsedUrl.query;
+    const headersObject=req.headers;
+    
+
+    const requestProperties={
+        parsedUrl,
         path,
         trimmedPath,
         method,
-        queryString,
-        query,
-        headers,
-        statusCode: 200,
-        message: 'success'
-    };
+        queryStringObject,
+        headersObject,
+    }
 
-    const chosenHandler = routers[trimmedPath] ? routers[trimmedPath] :notFound;
+    const decoder=new StringDecoder('utf-8');
+     
+    let realData='';
 
-    const decoder =new StringDecoder('utf8');
+    const chosenHandler=routes[trimmedPath]?routes[trimmedPath]:notFoundHandler;
 
-    let realData = '';
-    req.on('data', (buffer) => {
-        realData += decoder.write(buffer);
-    })
-    req.on('end', () => {
-        realData+=decoder.end();
-        requestProperties.body = parseJSON(realData);
-        
-        chosenHandler(requestProperties,(statusCode, payload)=> {
-            statusCode = typeof(statusCode) === 'number' ? statusCode : 500;
-            payload = typeof(payload) === 'object' ? payload : {};  
-            const payloadString = JSON.stringify(payload);          
-            res.setHeader('Content-Type', 'application/json');
-            res.writeHead(statusCode);
-            res.end(payloadString);
-        })
-    });
     
-};
+    
+    req.on('data',(buffer)=>{
+        realData += decoder.write(buffer);
+    });
+    req.on('end',()=>{
+        realData+=decoder.end();
+        
+        requestProperties.body = parseJSON(realData);
 
-module.exports = handler;
+        chosenHandler(requestProperties,(statusCode, payload)=>{
+            statusCode=typeof(statusCode)==='number'?statusCode:500;
+            payload=typeof(payload)==='object'?payload:{};
+    
+            const payloadString = JSON.stringify(payload);
+    
+            //return the final response
+            res.setHeader('content-type', 'application/json')
+            res.writeHead(statusCode);
+            res.end(payloadString)
+        })
+        //res.end('Hello world frind');
+    });
+    // response handle
+};
+//start the server
+
+module.exports=handler;

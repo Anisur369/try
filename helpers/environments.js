@@ -1,32 +1,47 @@
-const environments={};
+/*
+*Title: Environments
+*Description: Handle all environment related things
+*Author: Anisur Rahman (Learn with Anis)
+*Date:19/12/24
+*
+*/
 
-environments.staging={
-    port:3000,
-    envName:'staging',
-    secretKey:'secretKey1234',
-    mongoURI:'mongodb://localhost:27017/node-rest-api-example',
-    maxChecks:5
+//Dependencies
+
+//module scaffolding
+
+const environments = {};
+
+//staging (default) environment variables
+
+environments.staging = {
+  port: 3000,
+  envName: 'staging',
+  hashingSecret: 'thisIsASecret',
+  maxChecks: 5,
+  expiresIn: 1 * 60 * 60 * 1000, // 1 hour
+  secretKey: 'stagingKey',
 };
 
+//production environment variables
 
-environments.production={
-    port:5000,
-    envName:'production',
-    secretKey:'your_production_secret_key',
-    mongoURI:'your_production_mongodb_uri',
-    maxChecks:5
+environments.production = {
+  port: 5000,
+  envName: 'production',
+  hashingSecret: 'thisIsAlsoASecret',
+  maxChecks: 5,
+  expiresIn: 1 * 60 * 60 * 1000, // 1 hour
+  secretKey: 'productionKey',
 };
 
-environments.development={
-    port:6000,
-    envName:'development',
-    secretKey:'your_development_secret_key',
-    mongoURI:'your_development_mongodb_uri',
-    maxChecks:5
-};
+//determine which environment to use
 
-const currentEnvironment = typeof(process.env.NODE_ENV) === 'string' ? process.env.NODE_ENV : 'staging';
+// eslint-disable-next-line no-undef
+const currentEnvironment = typeof(process.env.NODE_ENV) === 'string' ? process.env.NODE_ENV:'staging';
 
-const environmentToExport = typeof(environments[currentEnvironment]) === 'object' ? environments[currentEnvironment] : environments.staging;
+const environmentToExport = typeof(environments[currentEnvironment])==='object'?environments[currentEnvironment]:environments.staging;
 
-module.exports=environmentToExport;
+module.exports = environmentToExport;
+
+// End of code
+//----------------------------------------------------------------powered by the Anisur Rahman

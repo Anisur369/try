@@ -6,59 +6,29 @@
 *
 */
 //Dependencies
-const http = require('http');
-const {handleReqRes} = require('./helpers/handleReqRes');
-const environments = require('./helpers/environments');
+const http=require('http');
+
+const {handleReqRes}=require('./helpers/handleReqRes');
+const environment=require('./helpers/environments');
 const data = require('./lib/data');
 
-// data.create('test','newFile',{'name': 'Bangladesh','language': 'Bangla','color':'green'},(err)=>{
-//     if(!err){
-//         console.log('File created successfully');
-//     }else{
-//         console.log('Error in creating file:-',err);
-//     }
-// });
 
-// data.read('test','newFile',(err,data)=>{
-//     if(!err){
-//         console.log(data);
-//     }else{
-//         console.log('Error in creating file:-',err);
-//     }
-// });
+const app = {};
 
-// data.update('test','newFile', {'name': 'Bangladesh','lang':'en'},(err,result)=>{
-//     if(!err){
-//         console.log('result');
-//     }else{
-//         console.log('Error in creating file:-',err);
-//     }
-// });
 
-// data.delete('test','newFile', (err) => {
-//     if(!err){
-//         console.log('File deleted successfully');
-//     }else{
-//         console.log('Error in deleting file:-',err);
-//     }
-// })
 
-let app = {};
-// Create the server
 app.createServer = () => {
     const server = http.createServer(app.handleReqRes);
-    server.listen(environments.port,() => {
-
-
-
-        
-        console.log(`Server is running on port http://localhost:${environments.port}`);
+    server.listen(environment.port, () => {
+        console.log(`listening to port http://localhost:${environment.port}`);
     });
-}
-
-// Request and response handlers
-app.handleReqRes = handleReqRes;
+};
 
 
 
+//handle Request Response
+app.handleReqRes=handleReqRes;
+
+
+//start the server
 app.createServer();
